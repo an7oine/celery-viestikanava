@@ -105,7 +105,10 @@ class Viestikanava:
     self._saapuva = asyncio.Queue()
 
   def _vastaanottaja(self, viesti):
-    self._saapuva.put_nowait(viesti)
+    asyncio.run_coroutine_threadsafe(
+      self._saapuva.put(viesti),
+      self._loop
+    )
     # def _vastaanottaja
 
   async def __aenter__(self):
