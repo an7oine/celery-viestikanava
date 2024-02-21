@@ -128,14 +128,26 @@ class Viestikanava:
     self._viestikanava.__exit__(*args)
     # async def __aexit__
 
+  async def __aiter__(self):
+    while True:
+      yield await self.lue()
+    # async def __aiter__
+
   async def lue(self):
     return await self._saapuva.get()
 
-  async def kirjoita(self, **viesti):
+  async def kirjoita(self, *args, **kwargs):
     self._viestikanava.laheta_viesti(
       _alikanava=self.alikanava,
-      **viesti,
+      **dict(*args, **kwargs),
     )
     # async def kirjoita
+
+  def kirjoita_taustalla(self, *args, **kwargs):
+    self._viestikanava.laheta_viesti(
+      _alikanava=self.alikanava,
+      **dict(*args, **kwargs),
+    )
+    # def kirjoita_taustalla
 
   # class Viestikanava
