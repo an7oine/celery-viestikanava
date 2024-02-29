@@ -101,8 +101,6 @@ class Viestikanava:
 
   def __post_init__(self):
     self._viestikanava = _CeleryViestikanava(self.kanava)
-    self._loop = asyncio.get_running_loop()
-    self._saapuva = asyncio.Queue()
 
   def _vastaanottaja(self, viesti):
     asyncio.run_coroutine_threadsafe(
@@ -112,20 +110,22 @@ class Viestikanava:
     # def _vastaanottaja
 
   async def __aenter__(self):
-    self._viestikanava.__enter__()
+    self._loop = asyncio.get_running_loop()
+    self._saapuva = asyncio.Queue()
     self._viestikanava.lisaa_vastaanottaja(
       self.alikanava,
       self._vastaanottaja
     )
+    self._viestikanava.__enter__()
     return self
     # async def __aenter__
 
   async def __aexit__(self, *args):
+    self._viestikanava.__exit__(*args)
     self._viestikanava.poista_vastaanottaja(
       self.alikanava,
       self._vastaanottaja
     )
-    self._viestikanava.__exit__(*args)
     # async def __aexit__
 
   async def __aiter__(self):
